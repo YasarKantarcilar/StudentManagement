@@ -2,6 +2,7 @@ package studentcontrollers
 
 import (
 	"log"
+	"math/rand"
 	"os"
 	"time"
 
@@ -86,6 +87,11 @@ func CreateStudent(c *fiber.Ctx) error {
 	}
 
 	payload.Password = string(hashedPassword)
+	payload.StudentID = uint16(checkStudentID(c))
+
+	if count > 0 {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
 
 	insertResult, err := db.StudentsCollection.InsertOne(c.Context(), payload)
 	if err != nil {
@@ -109,6 +115,7 @@ func UpdateStudent(c *fiber.Ctx) error {
 			"firstName": payload.FirstName,
 			"lastName":  payload.LastName,
 			"email":     payload.Email,
+			"studentID": payload.StudentID,
 		},
 	}
 	_, err = db.StudentsCollection.UpdateOne(c.Context(), bson.M{"_id": studentMongoID}, update)
@@ -145,7 +152,7 @@ func LoginStudent(c *fiber.Ctx) error {
 	if err != nil {
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
-	token, err := SignJWT(student.ID, false)
+	token, err := SignJWT(student.ID.Hex(), false)
 	if err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
@@ -157,4 +164,22 @@ func LoginStudent(c *fiber.Ctx) error {
 	})
 
 	return c.SendStatus(fiber.StatusOK)
+}
+
+func randomStudentID() uint16 {
+	randomStudentID := rand.Intn(9999) + 1
+	return uint16(randomStudentID)
+}
+
+func checkStudentID(c *fiber.Ctx) uint16 {
+	randomID := randomStudentID()
+	findStudentByID := bson.M{"studentID": randomID}
+	count, err := db.StudentsCollection.CountDocuments(c.Context(), findStudentByID)
+	if err != nil {
+		return checkStudentID(c)
+	}
+	if count > 0 {
+		return checkStudentID(c)
+	}
+	return randomID
 }
