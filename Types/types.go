@@ -6,12 +6,26 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type JWT struct {
+	ID   primitive.ObjectID `json:"id"`
+	Role string             `json:"role"`
+}
+
+type User struct {
+	ID             primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	RoleID         primitive.ObjectID `json:"roleID" bson:"roleID"`
+	Email          string             `json:"email" bson:"email"`
+	Password       string             `json:"password" bson:"password"`
+	Role           string             `json:"role" bson:"role"`
+	Status         bool               `json:"status" bson:"status"`
+	RegisterDate   time.Time          `json:"registerDate" bson:"registerDate"`
+	LastUpdateDate time.Time          `json:"lastUpdateDate" bson:"lastUpdateDate"`
+}
+
 type Student struct {
 	ID             primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	FirstName      string             `json:"firstName" bson:"firstName"`
 	LastName       string             `json:"lastName" bson:"lastName"`
-	Email          string             `json:"email" bson:"email"`
-	Password       string             `json:"password" bson:"password"`
 	StudentID      uint16             `json:"studentID" bson:"studentID"`
 	RegisterDate   time.Time          `json:"registerDate" bson:"registerDate"`
 	LastUpdateDate time.Time          `json:"lastUpdateDate" bson:"lastUpdateDate"`

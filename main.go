@@ -4,10 +4,10 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	routers "studentmanagement.com/Routes"
 
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	StudentRoutes "studentmanagement.com/Routes/StudentRoutes"
 )
 
 func main() {
@@ -21,9 +21,10 @@ func main() {
 	}))
 	app.Use(logger.New())
 
-	StudentGroup := app.Group("/students")
+	// routes
+	usersRoutes := app.Group("/users")
 
-	StudentRoutes.StudentRoutes(StudentGroup)
+	routers.UserRoutes(usersRoutes)
 
 	// start server on port 3000
 	log.Fatal(app.Listen(":3000"))
